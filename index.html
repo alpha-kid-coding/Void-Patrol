@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#050811" />
+    <title>Void Patrol</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="game-shell">
+      <div class="play-layout">
+        <aside class="control-panel" aria-label="Game controls">
+          <div class="control-panel-heading">
+            <span class="status-light"></span>
+            <div>
+              <span>FLIGHT DECK</span>
+              <strong>CONTROLS</strong>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <span class="control-label">MOVEMENT</span>
+            <div class="control-row">
+              <button id="leftButton" type="button" aria-label="Move left">
+                <kbd>A</kbd><span>←</span>
+              </button>
+              <button id="rightButton" type="button" aria-label="Move right">
+                <kbd>D</kbd><span>→</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <span class="control-label">WEAPON</span>
+            <button id="fireButton" class="control-wide fire" type="button">
+              <kbd>SPACE</kbd><span>FIRE</span>
+            </button>
+            <button id="reloadButton" class="control-wide" type="button">
+              <kbd>R</kbd><span>RELOAD</span>
+            </button>
+          </div>
+
+          <div class="control-group">
+            <span class="control-label">POWER BANK</span>
+            <button id="powerButton" class="control-wide power" type="button">
+              <kbd>S</kbd><span>ACTIVATE</span>
+            </button>
+          </div>
+
+          <div class="control-group hangar">
+            <span class="control-label">SHIP HANGAR</span>
+            <div class="ship-options" role="group" aria-label="Choose ship body">
+              <button class="selected" type="button" data-ship-style="dart" aria-label="Dart ship">D</button>
+              <button type="button" data-ship-style="wing" aria-label="Wing ship">W</button>
+              <button type="button" data-ship-style="tank" aria-label="Tank ship">T</button>
+            </div>
+            <div class="paint-options" role="group" aria-label="Choose ship color">
+              <button class="cyan selected" type="button" data-ship-color="cyan" aria-label="Cyan paint"></button>
+              <button class="lime" type="button" data-ship-color="lime" aria-label="Lime paint"></button>
+              <button class="coral" type="button" data-ship-color="coral" aria-label="Coral paint"></button>
+              <button class="gold" type="button" data-ship-color="gold" aria-label="Gold paint"></button>
+              <button class="violet" type="button" data-ship-color="violet" aria-label="Violet paint"></button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <span class="control-label">MARKET</span>
+            <button id="shopControlButton" class="control-wide shop-control" type="button">
+              <span>₿</span><span>SHOP</span>
+            </button>
+          </div>
+
+          <div class="control-group">
+            <span class="control-label">ARCADE</span>
+            <button id="runnerButton" class="control-wide runner-control" type="button">
+              <span>◇</span><span>SPACE RUNNER</span>
+            </button>
+            <button id="adventureButton" class="control-wide adventure-control" type="button">
+              <span>✦</span><span>ADVENTURE</span>
+            </button>
+          </div>
+
+          <div class="control-group mission-controls">
+            <span class="control-label">MISSION</span>
+            <button id="pauseButton" class="control-wide" type="button">
+              <kbd>P</kbd><span>PAUSE</span>
+            </button>
+            <button id="quitControlButton" class="control-wide danger" type="button">
+              <span>QUIT</span>
+            </button>
+          </div>
+        </aside>
+
+        <div class="stage-column">
+      <header class="topbar">
+        <div class="brand">
+          <span class="brand-mark" aria-hidden="true"></span>
+          <div>
+            <p class="eyebrow">ORBITAL DEFENSE UNIT</p>
+            <h1>VOID PATROL</h1>
+          </div>
+        </div>
+
+        <div class="hud" aria-label="Game status">
+          <div class="hud-item">
+            <span>SCORE</span>
+            <strong id="score">000000</strong>
+          </div>
+          <div class="hud-item">
+            <span>HIGH</span>
+            <strong id="highScore">000000</strong>
+          </div>
+          <div class="hud-item crypto">
+            <span>CRYPTO</span>
+            <strong id="crypto">₿ 000</strong>
+          </div>
+          <div class="hud-item lives">
+            <span>SHIPS</span>
+            <strong id="lives">◆ ◆ ◆</strong>
+          </div>
+          <div class="hud-item health">
+            <span>HEALTH</span>
+            <strong id="health">100%</strong>
+          </div>
+          <div class="hud-item">
+            <span>WAVE</span>
+            <strong id="wave">01</strong>
+          </div>
+        </div>
+
+        <button id="soundButton" class="icon-button" type="button" aria-label="Toggle sound">
+          <span aria-hidden="true">♪</span>
+        </button>
+      </header>
+
+      <section class="screen-wrap">
+        <canvas id="game" width="960" height="640" aria-label="Void Patrol game"></canvas>
+        <div class="scanlines" aria-hidden="true"></div>
+
+        <div id="startPanel" class="panel">
+          <div class="panel-inner">
+            <p class="panel-kicker">INCOMING SIGNAL</p>
+            <h2>THE VOID<br /><em>IS MOVING</em></h2>
+            <p class="panel-copy">
+              Hold the line. Break the swarm before it reaches the planet.
+            </p>
+            <div class="difficulty-picker" role="group" aria-label="Choose difficulty">
+              <span class="difficulty-label">SELECT THREAT LEVEL</span>
+              <div class="difficulty-options">
+                <button type="button" data-difficulty="easy">EASY</button>
+                <button type="button" data-difficulty="normal">NORMAL</button>
+                <button type="button" data-difficulty="medium" class="selected">MEDIUM</button>
+                <button type="button" data-difficulty="hard">HARD</button>
+                <button type="button" data-difficulty="expert">EXPERT</button>
+                <button type="button" data-difficulty="impossible">IMPOSSIBLE</button>
+              </div>
+              <p id="difficultyDescription" class="difficulty-description">
+                Standard patrol conditions · 3 ships · ₿50 per wave
+              </p>
+            </div>
+            <button id="startButton" class="primary-button" type="button">
+              <span>LAUNCH MISSION</span>
+              <span aria-hidden="true">→</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="messagePanel" class="panel hidden">
+          <div class="panel-inner compact">
+            <p id="messageKicker" class="panel-kicker">MISSION STATUS</p>
+            <h2 id="messageTitle">PAUSED</h2>
+            <p id="messageCopy" class="panel-copy">Press P to return to the fight.</p>
+            <div class="message-actions">
+              <button id="messageButton" class="primary-button hidden" type="button">
+                <span id="messageButtonText">RETRY MISSION</span>
+                <span aria-hidden="true">→</span>
+              </button>
+              <button id="menuButton" class="secondary-button hidden" type="button">
+                <span id="menuButtonText">QUIT MISSION</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="shopPanel" class="panel shop-panel hidden">
+          <div class="shop-window">
+            <div class="shop-header">
+              <div>
+                <p class="panel-kicker">ORBITAL MARKET</p>
+                <h2>GEAR SHOP</h2>
+              </div>
+              <div class="shop-balance">
+                <span>AVAILABLE</span>
+                <strong id="shopCrypto">₿ 000</strong>
+              </div>
+            </div>
+
+            <p id="shopFeedback" class="shop-feedback">Upgrades are saved automatically.</p>
+
+            <div id="worldPreview" class="world-preview" aria-live="polite">
+              <div class="preview-stars" aria-hidden="true"></div>
+              <div class="preview-copy">
+                <span>ITEM PREVIEW</span>
+                <strong id="worldPreviewName">DEEP VOID</strong>
+                <small id="worldPreviewStatus">Select any item to inspect it before purchasing.</small>
+              </div>
+            </div>
+
+            <div class="shop-grid">
+              <article class="shop-card">
+                <span class="shop-category">SHIP</span>
+                <h3>FALCON DRIVE</h3>
+                <p>Increase movement speed by 15%.</p>
+                <button type="button" data-shop-item="falcon">BUY · ₿ 450</button>
+              </article>
+              <article class="shop-card">
+                <span class="shop-category">SHIP</span>
+                <h3>TITAN HULL</h3>
+                <p>Increase maximum health to 125.</p>
+                <button type="button" data-shop-item="titan">BUY · ₿ 650</button>
+              </article>
+              <article class="shop-card">
+                <span class="shop-category">SHIP</span>
+                <h3>HYPER DRIVE</h3>
+                <p>Stack another 20% movement boost.</p>
+                <button type="button" data-shop-item="hyper">BUY · ₿ 1,100</button>
+              </article>
+              <article class="shop-card">
+                <span class="shop-category">DEFENSE</span>
+                <h3>AEGIS ARMOR</h3>
+                <p>Upgrade maximum health to 160.</p>
+                <button type="button" data-shop-item="aegis">BUY · ₿ 1,600</button>
+              </article>
+              <article class="shop-card">
+                <span class="shop-category">DEFENSE</span>
+                <h3>AUTO SHIELD</h3>
+                <p>Begin every wave with a barrier charge.</p>
+                <button type="button" data-shop-item="autoshield">BUY · ₿ 1,800</button>
+              </article>
+              <article class="shop-card">
+                <span class="shop-category">BULLET</span>
+                <h3>ION BOLTS</h3>
+                <p>Player shots travel 20% faster.</p>
+                <button type="button" data-shop-item="ion">BUY · ₿ 400</button>
+              </article>
+              <article class="shop-card">
+                <span class="shop-category">BULLET</span>
+                <h3>PHASE ROUNDS</h3>
+                <p>Shots pierce through one invader.</p>
+                <button type="button" data-shop-item="phase">BUY · ₿ 900</button>
+              </article>
+              <article class="shop-card">
+                <span class="shop-category">WEAPON</span>
+                <h3>XL MAGAZINE</h3>
+                <p>Increase magazine capacity from 12 to 18.</p>
+                <button type="button" data-shop-item="magazine">BUY · ₿ 700</button>
+              </article>
+              <article class="shop-card">
+                <span class="shop-category">WEAPON</span>
+                <h3>PULSE REACTOR</h3>
+                <p>Reload and fire 25% faster.</p>
+                <button type="button" data-shop-item="reactor">BUY · ₿ 950</button>
+              </article>
+              <article class="shop-card">
+                <span class="shop-category">BULLET</span>
+                <h3>NOVA ROUNDS</h3>
+                <p>Larger rounds deal double asteroid damage.</p>
+                <button type="button" data-shop-item="nova">BUY · ₿ 1,300</button>
+              </article>
+              <article class="shop-card secret-card hidden">
+                <span class="shop-category">SECRET · STAGE 5</span>
+                <h3>STAR COLLECTOR</h3>
+                <p>More enemies enter battle carrying power-ups.</p>
+                <button type="button" data-shop-item="starcollector">BUY · ₿ 1,850</button>
+              </article>
+              <article class="shop-card secret-card hidden">
+                <span class="shop-category">SECRET · STAGE 10</span>
+                <h3>CHRONO CORE</h3>
+                <p>Stack another 15% firing and reload boost.</p>
+                <button type="button" data-shop-item="chronocore">BUY · ₿ 2,750</button>
+              </article>
+              <article class="shop-card secret-card hidden">
+                <span class="shop-category">SECRET · STAGE 15</span>
+                <h3>OMEGA CANNON</h3>
+                <p>Shots travel faster and deal one extra damage.</p>
+                <button type="button" data-shop-item="omega">BUY · ₿ 4,000</button>
+              </article>
+              <article class="shop-card world-card world-moon">
+                <span class="shop-category">WORLD</span>
+                <h3>NEON MOON</h3>
+                <p>Patrol above a luminous lunar grid.</p>
+                <button type="button" data-shop-item="moon">BUY · ₿ 750</button>
+              </article>
+              <article class="shop-card world-card world-nebula">
+                <span class="shop-category">WORLD</span>
+                <h3>RED NEBULA</h3>
+                <p>Enter the crimson deep-space front.</p>
+                <button type="button" data-shop-item="nebula">BUY · ₿ 1,200</button>
+              </article>
+              <article class="shop-card world-card world-ice">
+                <span class="shop-category">WORLD</span>
+                <h3>FROZEN RIFT</h3>
+                <p>Fight inside a glacial blue dimension.</p>
+                <button type="button" data-shop-item="ice">BUY · ₿ 2,000</button>
+              </article>
+              <article class="shop-card world-card world-solar">
+                <span class="shop-category">WORLD</span>
+                <h3>SOLAR FORGE</h3>
+                <p>Defend the blazing heart of a star.</p>
+                <button type="button" data-shop-item="solar">BUY · ₿ 2,600</button>
+              </article>
+            </div>
+
+            <button id="closeShopButton" class="secondary-button shop-close" type="button">
+              RETURN TO MISSION
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="statusbar">
+        <div><span class="status-light"></span><span id="statusText">SYSTEM READY</span></div>
+        <div class="desktop-tip">ORBITAL DEFENSE NETWORK · ONLINE</div>
+      </footer>
+        </div>
+      </div>
+    </main>
+
+    <script src="game.js"></script>
+  </body>
+</html>
